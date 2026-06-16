@@ -23,7 +23,11 @@ class JailbreakbenchDataset:
 
     def __init__(self, split: Literal["harmful", "benign"]):
         #add you path here TDDO
-        dataset: Dataset = load_dataset(f"/YOUR WORKSPACE/hm2026_task2/dataset", "behaviors", split=split)  # type: ignore
+        dataset = load_dataset(
+            "/mnt/workspace/AI_safety_lab/hm2026/hm2026_task2/dataset",
+            "behaviors",
+            split=split,
+        )
         df: pd.DataFrame = dataset.to_pandas()  # type: ignore
         self.df = df.drop(columns=["Index"])
         self.goals = self.df.Goal.to_list()

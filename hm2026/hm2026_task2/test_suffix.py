@@ -3,7 +3,7 @@ import json
 import torch
 import pandas as pd
 from tqdm.notebook import tqdm
-from config import MODEL_NAME, RESULT_DIR
+from config import NUM_SAMPLES, MODEL_NAME, RESULT_DIR, SELECTED_INDICES
 import jailbreakbench as jbb
 from transformers import AutoTokenizer, AutoModelForCausalLM
 model_id = MODEL_NAME
@@ -41,17 +41,25 @@ suffix_path = os.path.join(RESULT_DIR, "suffixes.json")
 with open(suffix_path, "r", encoding="utf-8") as f:
     suffixes = json.load(f)
 
-NUM_SAMPLES = len(suffixes)
+suffix_by_index = {
+    item["index"]: item["suffix"]
+    for item in suffixes
+}
 
-print(f"Loaded {NUM_SAMPLES} suffixes from {suffix_path}")
+print(f"Loaded {len(suffixes)} suffixes from {suffix_path}")
 
 
 # ===== 2. 读取对应 queries / targets =====
 
 dataset = jbb.read_dataset()
 
-queries = dataset.goals[:NUM_SAMPLES]
-targets = dataset.targets[:NUM_SAMPLES]
+if SELECTED_INDICES is None:
+    selected_indices = list(range(NUM_SAMPLES))
+else:
+    selected_indices = SELECTED_INDICES
+
+queries = [dataset.goals[i] for i in selected_indices]
+targets = [dataset.targets[i] for i in selected_indices]
 
 
 # ===== 3. 修复 pad_token，避免 generate 报错 =====
@@ -102,7 +110,8 @@ def generate_response(prompt, max_new_tokens=128, use_chat_template=False):
 
 rows = []
 
-for i, (query, target, suffix) in enumerate(zip(queries, targets, suffixes)):
+for i, (data_index, query, target) in enumerate(zip(selected_indices, queries, targets)):
+    suffix = suffix_by_index[data_index]
     attacked_prompt = query + " " + suffix
 
     original_output = generate_response(
@@ -119,9 +128,11 @@ for i, (query, target, suffix) in enumerate(zip(queries, targets, suffixes)):
 
     rows.append({
         "idx": i,
+        "dataset_index": data_index,
         "query": query,
         "target": target,
         "suffix": suffix,
+        "original_prompt": query,
         "attacked_prompt": attacked_prompt,
         "original_output": original_output,
         "attacked_output": attacked_output,

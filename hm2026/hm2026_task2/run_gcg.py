@@ -10,7 +10,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 from gcg.algorithm import GCGConfig, run
 
-from config import NUM_SAMPLES, MODEL_NAME, RESULT_DIR
+from config import NUM_SAMPLES, MODEL_NAME, RESULT_DIR, SELECTED_INDICES
 
 import os
 
@@ -48,8 +48,15 @@ if hasattr(model, "generation_config"):
 
 # 2. Load the harmful queries and target responses
 
-queries = jbb.read_dataset().goals[:NUM_SAMPLES]
-targets = jbb.read_dataset().targets[:NUM_SAMPLES]
+dataset = jbb.read_dataset()
+
+if SELECTED_INDICES is None:
+    selected_indices = list(range(NUM_SAMPLES))
+else:
+    selected_indices = SELECTED_INDICES
+
+queries = [dataset.goals[i] for i in selected_indices]
+targets = [dataset.targets[i] for i in selected_indices]
 
 
 # 3. Run GCG
@@ -65,9 +72,15 @@ config = GCGConfig(
 suffixes = []
 losses = []
 start_time = time.time()
-for query, target in tqdm(zip(queries, targets), total=len(queries), desc="Running GCG", unit="query"):
+for data_index, query, target in tqdm(zip(selected_indices, queries, targets), total=len(queries), desc="Running GCG", unit="query"):
     result = run(model, tokenizer, query, target, config)
-    suffixes.append(result.best_string)
+    suffixes.append({
+        "index": data_index,
+        "query": query,
+        "target": target,
+        "suffix": result.best_string,
+        "loss": result.best_loss,
+    })
     losses.append(result.best_loss)
 
 print(f"Time taken: {time.time() - start_time} seconds")
