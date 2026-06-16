@@ -73,7 +73,28 @@ def get_wordnet_synonyms(word, wordnet, language="eng"):
     3. Remove the original word, lemmas containing "_", and non-English words.
     4. Return sorted candidates without duplicates.
     """
-    raise NotImplementedError("TODO 1: implement WordNet synonym lookup")
+    original = word.lower()
+    synonyms = set()
+
+    for synset in wordnet.synsets(word, lang=language):
+        for lemma in synset.lemma_names(lang=language):
+            candidate = lemma.lower()
+
+            # WordNet uses "_" for multi-word expressions, e.g. "well_done".
+            if "_" in candidate:
+                continue
+
+            # Keep only English alphabetic single words.
+            if not candidate.isalpha():
+                continue
+
+            # Do not return the original word itself.
+            if candidate == original:
+                continue
+
+            synonyms.add(candidate)
+
+    return sorted(synonyms)
 
 
 def load_model(model_name_or_path, device=None):
@@ -178,7 +199,7 @@ def attack_score(probs, true_label):
     PWWS wants to reduce P(true_label), so the score should be larger when the
     model is less confident in the correct label.
     """
-    raise NotImplementedError("TODO 2: implement attack score")
+    return 1.0 - probs[true_label]
 
 
 def rank_words(tokens, true_label, state):
@@ -199,6 +220,13 @@ def rank_words(tokens, true_label, state):
 
     # TODO 3.1: replace each candidate word with state["unk_token"], build
     # leave-one-out texts, and query them with predict_counted(...).
+    leave_one_texts = []
+    for index in modifiable_indices:
+        masked_tokens = list(tokens)
+        masked_tokens[index] = state["unk_token"]
+        leave_one_texts.append(detokenize(masked_tokens))
+
+    leave_one_probs = predict_counted(state, leave_one_texts)
 
     saliency_scores = torch.tensor(
         [attack_score(probs, true_label) for probs in leave_one_probs],
@@ -208,10 +236,48 @@ def rank_words(tokens, true_label, state):
 
     # TODO 3.3: for each candidate word, try its valid synonyms and keep the
     # largest synonym attack score.
+    ranking_items = []
 
+    for position, index in enumerate(modifiable_indices):
+        word = tokens[index]
+        synonyms = valid_synonyms(
+            word,
+            state["wordnet"],
+            state["max_candidates"],
+        )
+
+        if not synonyms:
+            best_synonym_score = 0.0
+        else:
+            synonym_texts = []
+            for synonym in synonyms:
+                replaced_tokens = list(tokens)
+                replaced_tokens[index] = match_case(synonym, word)
+                synonym_texts.append(detokenize(replaced_tokens))
+
+            synonym_probs = predict_counted(state, synonym_texts)
+            best_synonym_score = max(
+                attack_score(probs, true_label) for probs in synonym_probs
+            )
+
+        pwws_score = saliency_weights[position].item() * best_synonym_score
+
+        ranking_items.append({
+            "index": index,
+            "word": word,
+            "score": pwws_score,
+        })
     # TODO 3.4: multiply saliency weights and best synonym scores, sort in
     # descending order, and return word_order plus word_ranking.
-    raise NotImplementedError("TODO 3: implement PWWS word ranking")
+    ranking_items.sort(key=lambda item: item["score"], reverse=True)
+
+    word_order = [item["index"] for item in ranking_items]
+    word_ranking = [
+        (item["index"], item["word"], item["score"])
+        for item in ranking_items
+    ]
+
+    return word_order, word_ranking
 
 
 def attack_one(text, true_label, base_state):
@@ -224,7 +290,101 @@ def attack_one(text, true_label, base_state):
     4. Keep a substitution only if it improves attack_score.
     5. Stop once the predicted label changes.
     """
-    raise NotImplementedError("TODO 4: implement greedy PWWS attack")
+    state = dict(base_state)
+    state["queries"] = 0
+
+    # 1. Predict the clean example.
+    clean_probs = predict_counted(state, [text])[0]
+    clean_label = int(torch.tensor(clean_probs).argmax().item())
+
+    result = {
+        "original_text": text,
+        "adversarial_text": text,
+        "original_label": clean_label,
+        "adversarial_label": clean_label,
+        "success": False,
+        "skipped": False,
+        "queries": 0,
+        "changed_words": [],
+        "word_ranking": [],
+    }
+
+    # If the clean example is already misclassified, skip it.
+    if clean_label != true_label:
+        result["skipped"] = True
+        result["queries"] = state["queries"]
+        return result
+
+    tokens = tokenize(text)
+    current_tokens = list(tokens)
+    current_score = attack_score(clean_probs, true_label)
+
+    # 2. Rank words by PWWS score.
+    word_order, word_ranking = rank_words(tokens, true_label, state)
+    result["word_ranking"] = word_ranking
+
+    # 3. Greedily replace words following the PWWS order.
+    for index in word_order:
+        original_word = current_tokens[index]
+        synonyms = valid_synonyms(
+            original_word,
+            state["wordnet"],
+            state["max_candidates"],
+        )
+
+        if not synonyms:
+            continue
+
+        candidate_texts = []
+        candidate_words = []
+
+        for synonym in synonyms:
+            candidate_tokens = list(current_tokens)
+            replacement = match_case(synonym, original_word)
+            candidate_tokens[index] = replacement
+
+            candidate_texts.append(detokenize(candidate_tokens))
+            candidate_words.append(replacement)
+
+        candidate_probs = predict_counted(state, candidate_texts)
+
+        best_position = None
+        best_score = current_score
+        best_label = clean_label
+
+        for position, probs in enumerate(candidate_probs):
+            score = attack_score(probs, true_label)
+
+            if score > best_score:
+                best_position = position
+                best_score = score
+                best_label = int(torch.tensor(probs).argmax().item())
+
+        # 4. Accept the substitution only if it improves the attack score.
+        if best_position is None:
+            continue
+
+        new_word = candidate_words[best_position]
+        current_tokens[index] = new_word
+        current_score = best_score
+
+        result["changed_words"].append(
+            (original_word, new_word, index)
+        )
+
+        adversarial_text = detokenize(current_tokens)
+        result["adversarial_text"] = adversarial_text
+        result["adversarial_label"] = best_label
+
+        # 5. Stop once the prediction changes.
+        if best_label != true_label:
+            result["success"] = True
+            result["queries"] = state["queries"]
+            return result
+
+    result["queries"] = state["queries"]
+    result["adversarial_text"] = detokenize(current_tokens)
+    return result
 
 
 def evaluate(examples, state):
