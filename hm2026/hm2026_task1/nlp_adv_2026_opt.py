@@ -168,7 +168,7 @@ def detokenize(tokens):
     return text
 
 
-def is_modifiable(token):
+def is_modifiable(token, min_word_len=2):
     """Only alphabetic non-stopwords can be modified."""
     token_lower = token.lower()
 
