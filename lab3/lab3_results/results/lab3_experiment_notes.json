@@ -1,0 +1,22 @@
+{
+    "experiment_goal": "Compare the effect of different k values in federated learning.",
+    "dataset": "CIFAR-10",
+    "model": "ResNet18 with final fc layer changed to 10 classes",
+    "federated_algorithm": "FedAvg-style aggregation",
+    "client_number": 10,
+    "compared_settings": [
+        {
+            "name": "fedavg_k3_ge10_le1_fixed_fc",
+            "k": 3,
+            "global_epochs": 10,
+            "local_epochs": 1
+        },
+        {
+            "name": "fedavg_k5_ge10_le1_fixed_fc",
+            "k": 5,
+            "global_epochs": 10,
+            "local_epochs": 1
+        }
+    ],
+    "important_fix": "The original torchvision ResNet18 output layer is for 1000 ImageNet classes. It was changed to Linear(512, 10) for CIFAR-10."
+}

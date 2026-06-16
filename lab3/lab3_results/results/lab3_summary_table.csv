@@ -1,0 +1,3 @@
+experiment,final_accuracy,best_accuracy,final_loss,min_loss,global_epochs,k,local_epochs,lambda_value,lr
+fedavg_k3_ge10_le1_fixed_fc,45.7,45.7,1.5792669120788574,1.5792669120788574,10,3,1,0.1,0.001
+fedavg_k5_ge10_le1_fixed_fc,50.870000000000005,50.870000000000005,1.3996699859619142,1.3996699859619142,10,5,1,0.1,0.001

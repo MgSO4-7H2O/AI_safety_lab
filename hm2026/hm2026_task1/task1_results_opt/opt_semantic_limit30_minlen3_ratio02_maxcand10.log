@@ -1,0 +1,218 @@
+[000] FAILED
+original: it has charm to spare , and unlike many romantic comedies , it does not alienate either gender in the audience . 
+adversarial: it has tempt to scanty, and unlike many romantic comedies, it does not alienate either gender in the audience.
+labels: 1 -> 1
+changed_words: [('spare', 'scanty', 4), ('charm', 'tempt', 2)]
+queries: 47
+--------------------------------------------------------------------------------
+[001] FAILED
+original: there are simply too many ideas floating around -- part farce , part sliding doors , part pop video -- and yet failing to exploit them . 
+adversarial: there are simply too many ideas float around - - part farce, persona sliding doors, persona pop video - - and yet failing to exploit them.
+labels: 0 -> 0
+changed_words: [('floating', 'float', 6), ('part', 'persona', 17), ('part', 'persona', 13)]
+queries: 96
+--------------------------------------------------------------------------------
+[002] FAILED
+original: the action switches between past and present , but the material link is too tenuous to anchor the emotional connections that purport to span a 125-year divide . 
+adversarial: the action exchange between past and present, but the material link is too tenuous to ground the excited connections that purport to span a 125 - year divide.
+labels: 0 -> 0
+changed_words: [('anchor', 'ground', 16), ('switches', 'exchange', 2), ('emotional', 'excited', 18)]
+queries: 76
+--------------------------------------------------------------------------------
+[003] SUCCESS
+original: the heavy-handed film is almost laughable as a consequence . 
+adversarial: the sonorous - handed film is most laughable as a consequence.
+labels: 0 -> 1
+changed_words: [('heavy', 'sonorous', 1), ('almost', 'most', 6)]
+queries: 50
+--------------------------------------------------------------------------------
+[004] SUCCESS
+original: collateral damage finally delivers the goods for schwarzenegger fans . 
+adversarial: collateral damage finally surrender the goods for schwarzenegger fans.
+labels: 1 -> 0
+changed_words: [('delivers', 'surrender', 3)]
+queries: 38
+--------------------------------------------------------------------------------
+[005] FAILED
+original: it 's not that kung pow is n't funny some of the time -- it just is n't any funnier than bad martial arts movies are all by themselves , without all oedekerk 's impish augmentation . 
+adversarial: it's not that kung pow is n't comic some of the time - - it but is n't any funnier than bad martial arts picture are all by themselves, without all oedekerk's impish augmentation.
+labels: 0 -> 0
+changed_words: [('just', 'but', 19), ('funny', 'comic', 11), ('movies', 'picture', 30)]
+queries: 72
+--------------------------------------------------------------------------------
+[006] FAILED
+original: a sequel that 's much too big for its britches . 
+adversarial: a sequel that's often too big for its britches.
+labels: 0 -> 0
+changed_words: [('much', 'often', 5)]
+queries: 11
+--------------------------------------------------------------------------------
+[007] SKIP
+original: an absurdist comedy about alienation , separation and loss . 
+adversarial: an absurdist comedy about alienation , separation and loss . 
+labels: 1 -> 1
+changed_words: []
+queries: 1
+--------------------------------------------------------------------------------
+[008] FAILED
+original: the film makes a fatal mistake : it asks us to care about a young man whose only apparent virtue is that he is not quite as unpleasant as some of the people in his life . 
+adversarial: the film establish a fatal fault: it asks us to care about a young man whose only plain virtue is that he is not quite as unpleasant as some of the people in his life.
+labels: 0 -> 0
+changed_words: [('makes', 'establish', 2), ('mistake', 'fault', 5), ('apparent', 'plain', 18)]
+queries: 84
+--------------------------------------------------------------------------------
+[009] SUCCESS
+original: ... mafia , rap stars and hood rats butt their ugly heads in a regurgitation of cinematic violence that gives brutal birth to an unlikely , but likable , hero . ' 
+adversarial: ... mafia, rap stars and hood rats butt their ugly heads in a regurgitation of cinematic violence that gives brutal birth to an unlikely, but appealing, hero.'
+labels: 1 -> 0
+changed_words: [('likable', 'appealing', 29)]
+queries: 82
+--------------------------------------------------------------------------------
+[010] FAILED
+original: a film about a young man finding god that is accessible and touching to the marrow . 
+adversarial: a film about a young man detect god that is accessible and disturb to the marrow.
+labels: 1 -> 1
+changed_words: [('touching', 'disturb', 12), ('finding', 'detect', 6)]
+queries: 69
+--------------------------------------------------------------------------------
+[011] SUCCESS
+original: it takes a certain kind of horror movie to qualify as ` worse than expected , ' but ghost ship somehow manages to do exactly that . 
+adversarial: it takes a certain kind of horror movie to qualify as ` big than expected,'but ghost ship somehow wield to do exactly that.
+labels: 0 -> 1
+changed_words: [('worse', 'big', 12), ('manages', 'wield', 21)]
+queries: 73
+--------------------------------------------------------------------------------
+[012] FAILED
+original: it 's also , clearly , great fun . 
+adversarial: it's also, clearly, bully fun.
+labels: 1 -> 1
+changed_words: [('great', 'bully', 7)]
+queries: 14
+--------------------------------------------------------------------------------
+[013] FAILED
+original: slick piece of cross-promotion . 
+adversarial: wily piece of cross - promotion.
+labels: 1 -> 1
+changed_words: [('slick', 'wily', 0)]
+queries: 30
+--------------------------------------------------------------------------------
+[014] SUCCESS
+original: unlike the speedy wham-bam effect of most hollywood offerings , character development -- and more importantly , character empathy -- is at the heart of italian for beginners . 
+adversarial: unlike the speedy wham - bam effect of most hollywood offerings, character development - - and more importantly, character empathy - - is at the middle of italian for beginners.
+labels: 1 -> 0
+changed_words: [('heart', 'middle', 27)]
+queries: 59
+--------------------------------------------------------------------------------
+[015] SUCCESS
+original: it 's one of those baseball pictures where the hero is stoic , the wife is patient , the kids are as cute as all get-out and the odds against success are long enough to intimidate , but short enough to make a dream seem possible . 
+adversarial: it's one of those baseball pictures where the hero is stoic, the wife is patient, the kids are as cute as all get - out and the odds against success are long enough to intimidate, but scant enough to make a dream seem possible.
+labels: 1 -> 0
+changed_words: [('short', 'scant', 41)]
+queries: 84
+--------------------------------------------------------------------------------
+[016] SUCCESS
+original: the film 's performances are thrilling . 
+adversarial: the film's performances are shudder.
+labels: 1 -> 0
+changed_words: [('thrilling', 'shudder', 6)]
+queries: 19
+--------------------------------------------------------------------------------
+[017] SUCCESS
+original: all that 's missing is the spontaneity , originality and delight . 
+adversarial: all that's overlook is the spontaneity, originality and delight.
+labels: 0 -> 1
+changed_words: [('missing', 'overlook', 4)]
+queries: 18
+--------------------------------------------------------------------------------
+[018] SUCCESS
+original: ... takes the beauty of baseball and melds it with a story that could touch anyone regardless of their familiarity with the sport 
+adversarial: ... takes the beauty of baseball and melds it with a story that could disturb anyone regardless of their familiarity with the sport
+labels: 1 -> 0
+changed_words: [('touch', 'disturb', 16)]
+queries: 69
+--------------------------------------------------------------------------------
+[019] SUCCESS
+original: there 's a wickedly subversive bent to the best parts of birthday girl . 
+adversarial: there's a wickedly subversive stoop to the better parts of birthday girl.
+labels: 1 -> 0
+changed_words: [('best', 'better', 9), ('bent', 'stoop', 6)]
+queries: 53
+--------------------------------------------------------------------------------
+[020] SUCCESS
+original: it 's inoffensive , cheerful , built to inspire the young people , set to an unending soundtrack of beach party pop numbers and aside from its remarkable camerawork and awesome scenery , it 's about as exciting as a sunburn . 
+adversarial: it's inoffensive, cheerful, built to inspire the young people, set to an unending soundtrack of beach party pop numbers and aside from its remarkable camerawork and awesome scenery, it's about as shake as a sunburn.
+labels: 0 -> 1
+changed_words: [('exciting', 'shake', 39)]
+queries: 74
+--------------------------------------------------------------------------------
+[021] SKIP
+original: i do n't think i laughed out loud once . 
+adversarial: i do n't think i laughed out loud once . 
+labels: 1 -> 1
+changed_words: []
+queries: 1
+--------------------------------------------------------------------------------
+[022] FAILED
+original: a science-fiction pastiche so lacking in originality that if you stripped away its inspirations there would be precious little left . 
+adversarial: a skill - fiction pastiche so lacking in originality that if you deprive away its inspirations there would be cherished little left.
+labels: 0 -> 0
+changed_words: [('science', 'skill', 1), ('precious', 'cherished', 19), ('stripped', 'deprive', 12)]
+queries: 51
+--------------------------------------------------------------------------------
+[023] SUCCESS
+original: the acting , costumes , music , cinematography and sound are all astounding given the production 's austere locales . 
+adversarial: the acting, costumes, music, cinematography and sound are all stupefying collapse the production's austere locales.
+labels: 1 -> 0
+changed_words: [('astounding', 'stupefying', 12), ('given', 'collapse', 13)]
+queries: 55
+--------------------------------------------------------------------------------
+[024] SUCCESS
+original: for the most part , it 's a work of incendiary genius , steering clear of knee-jerk reactions and quick solutions . 
+adversarial: for the most part, it's a sour of incendiary genius, steering clear of knee - jerk reactions and quick solutions.
+labels: 1 -> 0
+changed_words: [('work', 'sour', 9)]
+queries: 83
+--------------------------------------------------------------------------------
+[025] SKIP
+original: the lower your expectations , the more you 'll enjoy it . 
+adversarial: the lower your expectations , the more you 'll enjoy it . 
+labels: 1 -> 1
+changed_words: []
+queries: 1
+--------------------------------------------------------------------------------
+[026] FAILED
+original: uses sharp humor and insight into human nature to examine class conflict , adolescent yearning , the roots of friendship and sexual identity . 
+adversarial: habit shrewd humor and penetration into human nature to examine class conflict, adolescent yearning, the roots of friendship and sexual identity.
+labels: 1 -> 1
+changed_words: [('sharp', 'shrewd', 1), ('uses', 'habit', 0), ('insight', 'penetration', 4)]
+queries: 88
+--------------------------------------------------------------------------------
+[027] FAILED
+original: they should have called it gutterball . 
+adversarial: they should have promise it gutterball.
+labels: 0 -> 0
+changed_words: [('called', 'promise', 3)]
+queries: 23
+--------------------------------------------------------------------------------
+[028] SUCCESS
+original: further proof that the epicenter of cool , beautiful , thought-provoking foreign cinema is smack-dab in the middle of dubya 's axis of evil . 
+adversarial: further proof that the epicenter of chill, beautiful, thought - provoking foreign cinema is smack - dab in the middle of dubya's axis of vicious.
+labels: 1 -> 0
+changed_words: [('cool', 'chill', 6), ('evil', 'vicious', 28)]
+queries: 47
+--------------------------------------------------------------------------------
+[029] FAILED
+original: so unassuming and pure of heart , you ca n't help but warmly extend your arms and yell ` safe ! ' 
+adversarial: so unassuming and pure of heart, you ca n't help but warmly strain your weapon and yell ` safe!'
+labels: 1 -> 1
+changed_words: [('extend', 'strain', 15), ('arms', 'weapon', 17)]
+queries: 64
+--------------------------------------------------------------------------------
+total: 30
+clean_correct: 27
+successful: 14
+failed: 13
+skipped: 3
+attack_success_rate: 0.5185
+avg_queries: 56.63
+avg_changed_words: 1.74

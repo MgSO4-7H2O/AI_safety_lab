@@ -1,0 +1,3 @@
+experiment,global_epoch,k,no_models,local_epochs,lambda,lr,accuracy,loss,selected_clients
+test_k3_ge2_le1_fixed_fc,1,3,10,1,0.1,0.001,14.31,2.2999347000122072,"[1, 0, 4]"
+test_k3_ge2_le1_fixed_fc,2,3,10,1,0.1,0.001,19.73,2.1764507343292236,"[3, 9, 2]"
