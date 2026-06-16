@@ -177,7 +177,11 @@ def sample_ids_from_grad(
     #       (dim=1). torch.topk returns the LARGEST values, so think about the sign.
     #
     # Expected shape of topk_ids: (n_optim_tokens, topk)
-    topk_ids = ...  # TODO (3): your code here
+    topk_ids = torch.topk(
+        -grad,
+        k=topk,
+        dim=1,
+    ).indices
     # ===================================================================================
 
     sampled_ids_pos = torch.argsort(torch.rand((search_width, n_optim_tokens), device=grad.device))[..., :n_replace]
@@ -397,8 +401,10 @@ class GCG:
                     #
                     # Hint: `loss.min()` / `loss.argmin()` index into `sampled_ids`.
                     #       Remember to keep the batch dim, e.g. .unsqueeze(0).
-                    current_loss = ...  # TODO (4a): your code here
-                    optim_ids = ...     # TODO (4b): your code here
+                    best_index = loss.argmin()
+
+                    current_loss = loss[best_index].item()
+                    optim_ids = sampled_ids[best_index].unsqueeze(0)
                     # ==================================================================
                 else:
                     current_loss, optim_ids = find_executable_batch_size(self._compute_candidates_loss_probe_sampling, batch_size)(
@@ -519,10 +525,15 @@ class GCG:
         # Resulting shapes:
         #   optim_ids_onehot : (1, n_optim_tokens, vocab_size)
         #   optim_embeds     : (1, n_optim_tokens, embed_dim)
-        optim_ids_onehot = ...  # TODO (1a)
-        # (remember to set dtype/device and requires_grad before the matmul)
-        optim_embeds = ...      # TODO (1b)
         # =========================================================================================
+
+        optim_ids_onehot = torch.nn.functional.one_hot(
+            optim_ids,
+            num_classes=embedding_layer.num_embeddings,
+        ).to(device=model.device, dtype=model.dtype)
+
+        optim_ids_onehot.requires_grad_()
+        optim_embeds = optim_ids_onehot @ embedding_layer.weight
 
         if self.prefix_cache:
             input_embeds = torch.cat([optim_embeds, self.after_embeds, self.target_embeds], dim=1)
@@ -559,9 +570,12 @@ class GCG:
         # promising token substitutions.
         #
         # Hint: torch.autograd.grad(outputs=[...], inputs=[...]) returns a tuple; take [0].
-        optim_ids_onehot_grad = ...  # TODO (2): your code here
         # ===============================================================================
 
+        optim_ids_onehot_grad = torch.autograd.grad(
+            outputs=loss,
+            inputs=optim_ids_onehot,
+        )[0]
         return optim_ids_onehot_grad
 
     def _compute_candidates_loss_original(

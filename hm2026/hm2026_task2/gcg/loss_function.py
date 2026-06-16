@@ -29,7 +29,17 @@ def compute_loss(shift_logits: Tensor, shift_labels: Tensor) -> Tensor:
     #       flatten the leading dims:
     #         logits -> (batch * num_target_ids, vocab_size)
     #         labels -> (batch * num_target_ids,)
-    loss = ...  # TODO: your code here
-    # ===================================================================
+    
+    vocab_size = shift_logits.size(-1)
+
+    logits_2d = shift_logits.reshape(-1, vocab_size)
+    labels_1d = shift_labels.reshape(-1)
+
+    loss = F.cross_entropy(
+        logits_2d,
+        labels_1d,
+        reduction="none",
+    )
+
     
     return loss

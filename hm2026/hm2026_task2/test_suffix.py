@@ -3,20 +3,40 @@ import json
 import torch
 import pandas as pd
 from tqdm.notebook import tqdm
-from config import MODEL_NAME
+from config import MODEL_NAME, RESULT_DIR
 import jailbreakbench as jbb
 from transformers import AutoTokenizer, AutoModelForCausalLM
 model_id = MODEL_NAME
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+tokenizer = AutoTokenizer.from_pretrained(
+    model_id,
+    trust_remote_code=True,
+)
 
-#TO DO
-model = ...
-tokenizer = ...
+torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+
+model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    torch_dtype=torch_dtype,
+    trust_remote_code=True,
+)
+
+model.to(device)
+model.eval()
+
+if tokenizer.pad_token_id is None:
+    tokenizer.pad_token = tokenizer.eos_token
+
+if hasattr(model, "config"):
+    model.config.pad_token_id = tokenizer.pad_token_id
+
+if hasattr(model, "generation_config"):
+    model.generation_config.pad_token_id = tokenizer.pad_token_id
 
 # ===== 1. 读取 suffixes =====
 
-suffix_path = f"results/{MODEL_NAME}/suffixes.json"
+suffix_path = os.path.join(RESULT_DIR, "suffixes.json")
 
 with open(suffix_path, "r", encoding="utf-8") as f:
     suffixes = json.load(f)
@@ -88,13 +108,13 @@ for i, (query, target, suffix) in enumerate(zip(queries, targets, suffixes)):
     original_output = generate_response(
         query,
         max_new_tokens=128,
-        use_chat_template=False,   # 如果不是 chat model，可以改成 False
+        use_chat_template=True,   # 如果不是 chat model，可以改成 False
     )
 
     attacked_output = generate_response(
         attacked_prompt,
         max_new_tokens=128,
-        use_chat_template=False,   # 如果不是 chat model，可以改成 False
+        use_chat_template=True,   # 如果不是 chat model，可以改成 False
     )
 
     rows.append({
@@ -112,7 +132,7 @@ for i, (query, target, suffix) in enumerate(zip(queries, targets, suffixes)):
 
 df = pd.DataFrame(rows)
 
-out_dir = f"results/{MODEL_NAME}"
+out_dir = RESULT_DIR
 os.makedirs(out_dir, exist_ok=True)
 
 csv_path = f"{out_dir}/comparison_outputs.csv"

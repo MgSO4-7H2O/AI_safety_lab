@@ -10,7 +10,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 from gcg.algorithm import GCGConfig, run
 
-from config import NUM_SAMPLES, MODEL_NAME
+from config import NUM_SAMPLES, MODEL_NAME, RESULT_DIR
 
 import os
 
@@ -18,11 +18,32 @@ import os
 model_id = MODEL_NAME
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# 1. Load the model and tokenizer
+tokenizer = AutoTokenizer.from_pretrained(
+    model_id,
+    trust_remote_code=True,
+)
 
-# todo 1. Load the model and tokenizer
+torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-model = ...
-tokenizer = ...
+model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    torch_dtype=torch_dtype,
+    trust_remote_code=True,
+)
+
+model.to(device)
+model.eval()
+
+# Fix pad token for generation and batching.
+if tokenizer.pad_token_id is None:
+    tokenizer.pad_token = tokenizer.eos_token
+
+if hasattr(model, "config"):
+    model.config.pad_token_id = tokenizer.pad_token_id
+
+if hasattr(model, "generation_config"):
+    model.generation_config.pad_token_id = tokenizer.pad_token_id
 
 
 # 2. Load the harmful queries and target responses
@@ -55,8 +76,11 @@ print("Average loss: ", sum(losses) / len(losses))
 
 # 4. Save the adversarial suffixes
 
-os.makedirs(f"results/{MODEL_NAME}", exist_ok=True)
-with open(f"results/{MODEL_NAME}/suffixes.json", "w", encoding="utf-8") as f:
+os.makedirs(RESULT_DIR, exist_ok=True)
+
+suffix_path = os.path.join(RESULT_DIR, "suffixes.json")
+
+with open(suffix_path, "w", encoding="utf-8") as f:
     json.dump(suffixes, f, indent=4, ensure_ascii=False)
 
-print("Suffixes saved to results/suffixes.json")
+print(f"Suffixes saved to {suffix_path}")
